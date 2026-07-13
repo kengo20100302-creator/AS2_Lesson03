@@ -1,10 +1,19 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 // == スロットの管理クラス == //
 public class SlotManager : MonoBehaviour
 {
+    [Header("* * * Reel Object.")]
+    [SerializeField] private Transform[] _reels;
+    //[SerializeField] private float reelSpeed = 360f; // 度/秒
+
 
     private int[,] _slot;  //スロットの行列(二次元配列)
+    private int _reelStoped; //停止リール番号
+    private float[] _reelAngle; //リールの角度
+   
     void Start()
     {
         // 二次元配列では行列のデータを持つことができる。
@@ -16,12 +25,22 @@ public class SlotManager : MonoBehaviour
             { 3,3,3 },
             { 4,4,4 }
         };
+
+        _reelAngle = new float[ _slot.GetLength(1) ];
     }
 
     
     void Update()
     {
+        //スロットの配列を回転する
         PlayingSlot();
+        if(Keyboard.current.spaceKey.wasPressedThisFrame)
+        {   
+            _reelStoped++;
+        }
+        //先生のコード
+        //オブジェクトの角度の角度の更新
+        //RotateReelObject();
     }
 
     // === スロット回転のメインメソッド === //
@@ -30,9 +49,12 @@ public class SlotManager : MonoBehaviour
     {
         int reelLength = _slot.GetLength(1);
 
-        for (int x = 0; x < reelLength; x++)
+        for (int x = _reelStoped; x < reelLength; x++)
         {
             ReelLoop(x);
+
+            _reelAngle[x] += 360 / _slot.GetLength(0);
+            _reels[x].localRotation = Quaternion.Euler(_reelAngle[x], 0f, 0f);//X軸回転
         }
     }    
     // == スロットリールのループの管理 ==
@@ -58,7 +80,29 @@ public class SlotManager : MonoBehaviour
         //保存しておいた最後の値を、
         //配列の最初の[0番目]に代入する
         _slot[0, reelIndex] = temp;
+
+        
         
         Debug.Log($"_slot[0,{reelIndex}] = {_slot[0,reelIndex]}");
     }
+    
+    //先生のコード
+    //private void RotateReelObject()
+    //{
+    //for(int x =0; x < _slot.GetLength(1); x++)
+    //{    eulerAngles の x軸を リールの角度に更新する
+        //_reels[x].eulerAngles = Vector3.right * _reelAngles[x]  
+    //}
+    //}
+
+    //揃ったリール番号を取得する
+    //2026-07-27 まで宿題
+    //private int GethitReel(int[,] slot, int row)
+    //{
+        //bool hit = false;
+        //ヒット判定
+
+        //return hit;
+    //}
+    
 }
